@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PyFlix - Streaming</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+    <!-- ECRÃ DE LOGIN -->
+    <div id="login-view" class="view active">
+        <div class="auth-container">
+            <h1>PyFlix</h1>
+            <h2>Iniciar Sessão</h2>
+            <form id="login-form">
+                <input type="email" id="login-email" placeholder="E-mail" required>
+                <input type="password" id="login-senha" placeholder="Palavra-passe" required>
+                <button type="submit" class="btn-primary">Entrar</button>
+                <p id="login-error" class="error-msg"></p>
+            </form>
+            <p>Não tem conta? <a href="#" id="link-to-register">Registe-se aqui</a></p>
+        </div>
+    </div>
+
+    <!-- ECRÃ DE REGISTO -->
+    <div id="register-view" class="view">
+        <div class="auth-container">
+            <h1>PyFlix</h1>
+            <h2>Criar Conta</h2>
+            <form id="register-form">
+                <input type="text" id="reg-nome" placeholder="Nome completo" required>
+                <input type="email" id="reg-email" placeholder="E-mail" required>
+                <input type="password" id="reg-senha" placeholder="Palavra-passe (mín. 4 caracteres)" required>
+                <button type="submit" class="btn-primary">Registar</button>
+                <p id="register-error" class="error-msg"></p>
+            </form>
+            <p>Já tem conta? <a href="#" id="link-to-login">Iniciar sessão</a></p>
+        </div>
+    </div>
+
+    <!-- ECRÃ DE CATÁLOGO -->
+    <div id="catalog-view" class="view">
+        <header class="navbar">
+            <h1 class="logo">PyFlix</h1>
+            <div class="search-box">
+                <input type="text" id="search-input" placeholder="Pesquisar por título ou categoria...">
+            </div>
+            <div class="user-menu">
+                <span id="user-greeting">Olá, Utilizador</span>
+                <button id="btn-logout" class="btn-secondary">Sair</button>
+            </div>
+        </header>
+
+        <div class="catalog-content">
+            <section id="hero-banner" class="hero">
+                <div class="hero-info">
+                    <span class="hero-badge">DESTAQUE DA SEMANA</span>
+                    <h2 id="hero-title">Exterminador do Futuro 7</h2>
+                    <p id="hero-desc">O futuro é incerto, mas a luta pela sobrevivência é certa.</p>
+                    <div class="hero-buttons">
+                        <button id="btn-hero-watch" class="btn-primary">▶ Assistir Trailer</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Secções de Filmes Dinâmicas -->
+            <div id="categories-container">
+                <div class="category-section">
+                    <h3>Ação</h3>
+                    <div class="cards-row" id="row-acao"></div>
+                </div>
+                <div class="category-section">
+                    <h3>Terror</h3>
+                    <div class="cards-row" id="row-terror"></div>
+                </div>
+                <div class="category-section">
+                    <h3>Comédia & Outros</h3>
+                    <div class="cards-row" id="row-outros"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ECRÃ DO PLAYER DE VÍDEO -->
+    <div id="player-view" class="view">
+        <div class="player-navbar">
+            <button id="btn-back-catalog" class="btn-secondary">← Voltar ao Catálogo</button>
+            <h2 id="player-movie-title" style="font-size: 1.2rem;">Título do Vídeo</h2>
+        </div>
+        <div class="player-container">
+            <div class="video-wrapper">
+                <video id="video-player" controls>
+                    <source id="video-source" src="" type="video/mp4">
+                    O seu navegador não suporta o elemento de vídeo.
+                </video>
+            </div>
+            <p id="player-movie-desc" class="media-description">Descrição detalhada do conteúdo selecionado.</p>
+        </div>
+    </div>
+<!-- MODAL DE DETALHES DO FILME -->
+<div id="movie-modal" class="modal-overlay">
+    <div class="modal-box">
+        <button id="modal-close" class="modal-close-btn">&times;</button>
+        <div class="modal-header-info">
+            <h2 id="modal-title">Título do Filme</h2>
+            <span id="modal-category" class="hero-badge">Categoria</span>
+            <p id="modal-desc">Descrição completa do filme...</p>
+            <div class="hero-buttons" style="margin-top: 20px;">
+                <button id="modal-btn-play" class="btn-primary">▶ Assistir Agora</button>
+            </div>
+        </div>
+    </div>
+    </div>
+    <script src="{{ url_for('static', filename='app.js') }}"></script>
+</body>
+</html>

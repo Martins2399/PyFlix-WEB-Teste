@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#09090b">
+    <meta name="description" content="Explore filmes e trailers no PyFlix.">
+    <title>PyFlix — filmes para assistir</title>
+    <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/app.js" defer></script>
+</head>
+<body>
+    <main>
+        <section id="login-view" class="view auth-view active" aria-labelledby="login-title">
+            <div class="auth-card">
+                <a class="wordmark" href="/" aria-label="PyFlix, início">Py<span>Flix</span></a>
+                <p class="eyebrow">SEU PRÓXIMO FILME COMEÇA AQUI</p>
+                <h1 id="login-title">Entre no PyFlix</h1>
+                <p class="auth-intro">Uma seleção de histórias para descobrir e assistir.</p>
+                <form id="login-form" class="auth-form">
+                    <label for="login-email">E-mail</label>
+                    <input id="login-email" type="email" placeholder="voce@email.com" autocomplete="email" required>
+                    <label for="login-senha">Senha</label>
+                    <input id="login-senha" type="password" placeholder="Sua senha" autocomplete="current-password" required>
+                    <button class="button button-primary" type="submit">Entrar</button>
+                    <p id="login-error" class="form-message" role="status" aria-live="polite"></p>
+                </form>
+                <p class="auth-switch">Ainda não tem conta? <a href="#" id="link-to-register">Criar conta</a></p>
+                <div class="auth-divider"><span>ou</span></div>
+                <button id="btn-guest" class="button button-guest" type="button">Explorar como visitante</button>
+                <p class="preview-note">Pré-visualização web · acesso de demonstração</p>
+            </div>
+        </section>
+
+        <section id="register-view" class="view auth-view" aria-labelledby="register-title">
+            <div class="auth-card">
+                <a class="wordmark" href="/" aria-label="PyFlix, início">Py<span>Flix</span></a>
+                <p class="eyebrow">FAÇA PARTE</p>
+                <h1 id="register-title">Criar conta</h1>
+                <p class="auth-intro">O cadastro estará disponível quando a autenticação do servidor estiver conectada.</p>
+                <form id="register-form" class="auth-form">
+                    <label for="reg-nome">Nome</label>
+                    <input id="reg-nome" type="text" placeholder="Seu nome" autocomplete="name" required>
+                    <label for="reg-email">E-mail</label>
+                    <input id="reg-email" type="email" placeholder="voce@email.com" autocomplete="email" required>
+                    <label for="reg-senha">Senha</label>
+                    <input id="reg-senha" type="password" placeholder="Mínimo de 4 caracteres" minlength="4" autocomplete="new-password" required>
+                    <button class="button button-primary" type="submit">Criar conta</button>
+                    <p id="register-error" class="form-message" role="status" aria-live="polite"></p>
+                </form>
+                <p class="auth-switch">Já tem conta? <a href="#" id="link-to-login">Voltar para entrar</a></p>
+            </div>
+        </section>
+
+        <section id="catalog-view" class="view catalog-view" aria-label="Catálogo PyFlix">
+            <header class="navbar">
+                <a class="wordmark" href="/" aria-label="PyFlix, início">Py<span>Flix</span></a>
+                <label class="search-box" for="search-input">
+                    <span aria-hidden="true">⌕</span>
+                    <input id="search-input" type="search" placeholder="Buscar filmes ou categorias" autocomplete="off">
+                </label>
+                <div class="user-menu">
+                    <span id="user-greeting">Olá, visitante</span>
+                    <button id="btn-logout" class="button button-small button-outline" type="button">Sair</button>
+                </div>
+            </header>
+
+            <div class="catalog-content">
+                <section class="hero" aria-labelledby="hero-title">
+                    <div class="hero-shade"></div>
+                    <div class="hero-info">
+                        <span class="hero-badge">DESTAQUE DA SEMANA</span>
+                        <p class="hero-kicker">UMA NOVA AVENTURA ESPERA POR VOCÊ</p>
+                        <h1 id="hero-title">Exterminador do Futuro 7</h1>
+                        <p id="hero-desc">O futuro é incerto, mas a luta pela sobrevivência é certa.</p>
+                        <button id="btn-hero-watch" class="button button-primary" type="button">
+                            <span aria-hidden="true">▶</span> Ver destaque
+                        </button>
+                    </div>
+                    <span class="hero-index" aria-hidden="true">01 <span>/ 07</span></span>
+                </section>
+
+                <div id="categories-container" class="categories">
+                    <section class="category-section" aria-labelledby="action-heading">
+                        <div class="section-heading">
+                            <h2 id="action-heading">Ação</h2>
+                            <span>Histórias em alta</span>
+                        </div>
+                        <div class="cards-row" id="row-acao"></div>
+                    </section>
+                    <section class="category-section" aria-labelledby="horror-heading">
+                        <div class="section-heading">
+                            <h2 id="horror-heading">Terror</h2>
+                            <span>Para quem gosta de suspense</span>
+                        </div>
+                        <div class="cards-row" id="row-terror"></div>
+                    </section>
+                    <section class="category-section" aria-labelledby="other-heading">
+                        <div class="section-heading">
+                            <h2 id="other-heading">Mais para descobrir</h2>
+                            <span>Outros gêneros</span>
+                        </div>
+                        <div class="cards-row" id="row-outros"></div>
+                    </section>
+                    <p id="empty-search" class="empty-search" hidden>Nenhum filme encontrado. Tente outro título ou categoria.</p>
+                </div>
+            </div>
+
+            <footer class="site-footer">
+                <span class="wordmark wordmark-small">Py<span>Flix</span></span>
+                <span>Pré-visualização do catálogo</span>
+            </footer>
+        </section>
+
+        <section id="player-view" class="view player-view" aria-label="Reprodutor de vídeo">
+            <header class="player-navbar">
+                <button id="btn-back-catalog" class="button button-outline" type="button">← Voltar ao catálogo</button>
+                <a class="wordmark" href="/" aria-label="PyFlix, início">Py<span>Flix</span></a>
+            </header>
+            <div class="player-container">
+                <p class="eyebrow">AGORA EM REPRODUÇÃO</p>
+                <h1 id="player-movie-title">Título do vídeo</h1>
+                <div class="video-wrapper">
+                    <video id="video-player" controls playsinline preload="metadata">
+                        <source id="video-source" src="" type="video/mp4">
+                        Seu navegador não suporta a reprodução de vídeo.
+                    </video>
+                </div>
+                <p id="player-movie-desc" class="media-description"></p>
+            </div>
+        </section>
+    </main>
+
+    <div id="movie-modal" class="modal-overlay" aria-hidden="true">
+        <section class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-desc">
+            <button id="modal-close" class="modal-close-btn" type="button" aria-label="Fechar detalhes">×</button>
+            <p class="eyebrow">DETALHES DO FILME</p>
+            <h2 id="modal-title">Título do filme</h2>
+            <span id="modal-category" class="hero-badge">Categoria</span>
+            <p id="modal-desc">Descrição do filme.</p>
+            <button id="modal-btn-play" class="button button-primary" type="button">▶ Assistir agora</button>
+        </section>
+    </div>
+</body>
+</html>
