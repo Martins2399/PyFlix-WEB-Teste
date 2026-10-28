@@ -1,0 +1,1 @@
+- [PyFlix web-first requirements](pyflix-web-first.md) — keep the product web-only, with film metadata and media references loaded from its database.

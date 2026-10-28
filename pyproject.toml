@@ -1,0 +1,14 @@
+[project]
+name = "pyflix-web"
+version = "0.1.0"
+description = "Aplicação web de catálogo de filmes com Flask."
+requires-python = ">=3.13"
+dependencies = [
+    "flask>=3.1.3",
+    "gunicorn>=26.2.0",
+    "psycopg[binary]>=3.3.6",
+    "sqlalchemy>=2.1.6",
+]
+
+[tool.uv]
+package = false

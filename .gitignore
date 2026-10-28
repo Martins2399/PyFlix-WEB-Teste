@@ -1,0 +1,16 @@
+__pycache__/
+*.py[cod]
+.pythonlibs/
+.venv/
+.venv-*/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.env
+.env.*
+!.env.example
+*.db-shm
+*.db-wal
+instance/
+generated-artifacts/
+PyFlix - WEB/usuarios.db

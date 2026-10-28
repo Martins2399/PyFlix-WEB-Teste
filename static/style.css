@@ -367,9 +367,14 @@ input:focus-visible {
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 18px;
     background:
-        url("/static/images/exterminador_7.webp") center 33% / cover,
+        var(--hero-image, url("/static/images/exterminador_7.webp")) center 33% / cover,
         #242126;
     isolation: isolate;
+}
+
+.hero[hidden],
+#empty-search[hidden] {
+    display: none;
 }
 
 .hero-shade {
@@ -443,6 +448,33 @@ input:focus-visible {
     display: grid;
     gap: 46px;
     min-height: 160px;
+}
+
+.catalog-status {
+    margin: 0;
+    color: var(--muted);
+    font-size: 0.9rem;
+}
+
+.catalog-error {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+    padding: 18px 20px;
+    border: 1px solid rgba(255, 115, 123, 0.3);
+    border-radius: 12px;
+    color: #ffb0b5;
+    background: rgba(229, 9, 20, 0.08);
+}
+
+.catalog-error[hidden],
+.catalog-status[hidden] {
+    display: none;
+}
+
+.catalog-error p {
+    margin: 0;
 }
 
 .category-section[hidden] {
@@ -744,6 +776,11 @@ input:focus-visible {
     .section-heading > span {
         display: block;
         margin-top: 5px;
+    }
+
+    .catalog-error {
+        align-items: flex-start;
+        flex-direction: column;
     }
 }
 

@@ -1,30 +1,35 @@
-entrypoint = "index.html"
+entrypoint = "server.py"
 modules = ["web", "python-base-3.13", "nodejs-24"]
 
-[nix]
-channel = "stable-24_11"
-packages = ["static-web-server"]
-
 [deployment]
-publicDir = "/"
-deploymentTarget = "static"
+deploymentTarget = "autoscale"
+run = ["env", "APP_ENV=production", "gunicorn", "--bind=0.0.0.0:5000", "--reuse-port", "server:app"]
+build = ["pip", "install", "-r", "requirements.txt"]
 
 [workflows]
-runButton = "Serve static"
+runButton = "Project"
 
 [[workflows.workflow]]
-name = "Serve static"
+name = "Project"
 mode = "parallel"
+author = "agent"
+
+[[workflows.workflow.tasks]]
+task = "workflow.run"
+args = "Start PyFlix"
+
+[[workflows.workflow]]
+name = "Start PyFlix"
+author = "agent"
 
 [[workflows.workflow.tasks]]
 task = "shell.exec"
-args = """
-echo \"Serving HTML, open the Preview to see your output.
-To see changes you make, you can hit the refresh button in the preview, you do \u001B[1mnot\u001B[0m have to stop and run again.
-Console logs are available in the Preview devtools or your browser devtools.\" && static-web-server -w ./.config/static-web-server.toml > /dev/null 2>&1
-"""
-waitForPort = 80
+args = "./.pythonlibs/bin/python server.py"
+waitForPort = 5000
+
+[workflows.workflow.metadata]
+outputType = "webview"
 
 [[ports]]
-localPort = 80
+localPort = 5000
 externalPort = 80

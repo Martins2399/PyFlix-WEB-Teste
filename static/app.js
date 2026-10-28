@@ -1,63 +1,6 @@
-const catalogoDados = [
-    {
-        id: 1,
-        titulo: "Exterminador do Futuro 7",
-        descricao: "O futuro é incerto, mas a luta pela sobrevivência é certa.",
-        categoria: "Ação",
-        imagem: "images/exterminador_7.webp",
-        video: "videos/exterminador_7.mp4"
-    },
-    {
-        id: 2,
-        titulo: "A 5ª Onda",
-        descricao: "Quando a humanidade enfrenta uma ameaça inesperada, a esperança transforma-se em luta.",
-        categoria: "Ação",
-        imagem: "images/a-5-onda.webp",
-        video: "videos/a-5-onda.mp4"
-    },
-    {
-        id: 3,
-        titulo: "Minecraft: O Filme",
-        descricao: "Uma aventura emocionante no mundo de blocos e criatividade.",
-        categoria: "Comédia",
-        imagem: "images/minecraft-o-filme.webp",
-        video: "videos/minecraft-o-filme.mp4"
-    },
-    {
-        id: 4,
-        titulo: "Terror no Rio",
-        descricao: "Uma história de terror que se desenrola nas águas turbulentas de um rio misterioso.",
-        categoria: "Terror",
-        imagem: "images/terror-rio.webp",
-        video: "videos/terror-rio.mp4"
-    },
-    {
-        id: 5,
-        titulo: "Maldição da Múmia",
-        descricao: "Uma antiga maldição desperta quando um arqueólogo desenterra um sarcófago.",
-        categoria: "Terror",
-        imagem: "images/maldicao-da-mumia.webp",
-        video: "videos/maldicao-da-mumia.mp4"
-    },
-    {
-        id: 6,
-        titulo: "Sim Senhor",
-        descricao: "Uma história de amor que transcende o tempo e as circunstâncias.",
-        categoria: "Romance",
-        imagem: "images/sim-senhor.webp",
-        video: "videos/sim-senhor.mp4"
-    },
-    {
-        id: 7,
-        titulo: "Animais Fantásticos",
-        descricao: "Uma aventura de criaturas mágicas e desafios intensos.",
-        categoria: "Fantasia",
-        imagem: "images/animais-fantasticos.webp",
-        video: "videos/animais-fantasticos.mp4"
-    }
-];
-
+let catalogoDados = [];
 let filmeSelecionadoAtual = null;
+let usuarioAtual = null;
 
 function mostrarEcra(idEcra) {
     document.querySelectorAll(".view").forEach((view) => {
@@ -66,12 +9,50 @@ function mostrarEcra(idEcra) {
     window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
+function urlMidia(caminho) {
+    return `/static/${caminho.split("/").map(encodeURIComponent).join("/")}`;
+}
+
+async function requisicaoJson(url, options = {}) {
+    const headers = new Headers(options.headers || {});
+    if (options.body && !headers.has("Content-Type")) {
+        headers.set("Content-Type", "application/json");
+    }
+
+    const response = await fetch(url, {
+        credentials: "same-origin",
+        ...options,
+        headers
+    });
+    const resultado = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+        throw new Error(resultado.mensagem || "Não foi possível concluir a solicitação.");
+    }
+    return resultado;
+}
+
+function alternarCarregamento(form, carregando) {
+    const botao = form.querySelector('button[type="submit"]');
+    if (!botao) return;
+    if (carregando) {
+        botao.dataset.labelOriginal = botao.textContent;
+        botao.disabled = true;
+        botao.textContent = "Aguarde…";
+    } else {
+        botao.disabled = false;
+        botao.textContent = botao.dataset.labelOriginal || botao.textContent;
+    }
+}
+
 function abrirModalDetalhes(filme) {
     filmeSelecionadoAtual = filme;
     document.getElementById("modal-title").textContent = filme.titulo;
     document.getElementById("modal-category").textContent = filme.categoria;
     document.getElementById("modal-desc").textContent = filme.descricao;
+
     const modal = document.getElementById("movie-modal");
+    modal.dataset.returnFocus = document.activeElement?.id || "";
     modal.classList.add("active");
     modal.setAttribute("aria-hidden", "false");
     document.getElementById("modal-close").focus();
@@ -81,6 +62,28 @@ function fecharModal() {
     const modal = document.getElementById("movie-modal");
     modal.classList.remove("active");
     modal.setAttribute("aria-hidden", "true");
+
+    const returnFocus = modal.dataset.returnFocus
+        ? document.getElementById(modal.dataset.returnFocus)
+        : null;
+    returnFocus?.focus();
+}
+
+function atualizarDestaque(filmes) {
+    const hero = document.querySelector(".hero");
+    const filme = filmes.find((item) => item.destaque) || filmes[0];
+    if (!filme) {
+        hero.hidden = true;
+        return;
+    }
+
+    hero.hidden = false;
+    hero.style.setProperty("--hero-image", `url("${urlMidia(filme.imagem)}")`);
+    document.getElementById("hero-title").textContent = filme.titulo;
+    document.getElementById("hero-desc").textContent = filme.descricao;
+    document.getElementById("hero-index-current").textContent = "01";
+    document.getElementById("hero-index-total").textContent = String(filmes.length).padStart(2, "0");
+    document.getElementById("btn-hero-watch").setAttribute("aria-label", `Ver detalhes de ${filme.titulo}`);
 }
 
 function carregarCatalogoFilmes(listaFilmes) {
@@ -109,7 +112,7 @@ function carregarCatalogoFilmes(listaFilmes) {
             card.setAttribute("aria-label", `Ver detalhes de ${filme.titulo}`);
 
             const poster = document.createElement("img");
-            poster.src = `/static/${filme.imagem}`;
+            poster.src = urlMidia(filme.imagem);
             poster.alt = "";
             poster.loading = "lazy";
 
@@ -117,11 +120,11 @@ function carregarCatalogoFilmes(listaFilmes) {
             title.className = "card-title";
             title.textContent = filme.titulo;
 
-            const category = document.createElement("span");
-            category.className = "card-category";
-            category.textContent = filme.categoria;
+            const categoryLabel = document.createElement("span");
+            categoryLabel.className = "card-category";
+            categoryLabel.textContent = filme.categoria;
 
-            card.append(poster, title, category);
+            card.append(poster, title, categoryLabel);
             card.addEventListener("click", () => abrirModalDetalhes(filme));
             linha.append(card);
         });
@@ -130,10 +133,39 @@ function carregarCatalogoFilmes(listaFilmes) {
     document.getElementById("empty-search").hidden = totalVisivel !== 0;
 }
 
-function entrarComoVisitante() {
-    document.getElementById("user-greeting").textContent = "Olá, visitante";
-    carregarCatalogoFilmes(catalogoDados);
+async function carregarCatalogo() {
+    const status = document.getElementById("catalog-status");
+    const errorPanel = document.getElementById("catalog-error");
+    status.hidden = false;
+    status.textContent = "Carregando catálogo do banco de dados…";
+    errorPanel.hidden = true;
+
+    try {
+        const resultado = await requisicaoJson("/api/filmes");
+        if (!Array.isArray(resultado.filmes)) {
+            throw new Error("O servidor retornou um catálogo inválido.");
+        }
+        catalogoDados = resultado.filmes;
+        atualizarDestaque(catalogoDados);
+        carregarCatalogoFilmes(catalogoDados);
+        status.hidden = true;
+    } catch (error) {
+        catalogoDados = [];
+        status.hidden = true;
+        errorPanel.hidden = false;
+        errorPanel.querySelector("p").textContent = error.message
+            || "Não foi possível carregar o catálogo agora.";
+    }
+}
+
+async function entrarNoCatalogo(utilizador = null) {
+    usuarioAtual = utilizador;
+    document.getElementById("user-greeting").textContent = utilizador
+        ? `Olá, ${utilizador.nome}`
+        : "Olá, visitante";
+    document.getElementById("search-input").value = "";
     mostrarEcra("catalog-view");
+    await carregarCatalogo();
 }
 
 function abrirPlayer(filme) {
@@ -141,35 +173,87 @@ function abrirPlayer(filme) {
     document.getElementById("player-movie-desc").textContent = filme.descricao;
 
     const video = document.getElementById("video-player");
-    const source = document.getElementById("video-source");
-    source.src = `/static/${filme.video}`;
+    document.getElementById("video-source").src = urlMidia(filme.video);
     video.load();
     mostrarEcra("player-view");
+}
+
+function mostrarErro(idElemento, mensagem) {
+    document.getElementById(idElemento).textContent = mensagem;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("link-to-register").addEventListener("click", (event) => {
         event.preventDefault();
+        mostrarErro("login-error", "");
         mostrarEcra("register-view");
+        document.getElementById("reg-nome").focus();
     });
 
     document.getElementById("link-to-login").addEventListener("click", (event) => {
         event.preventDefault();
+        mostrarErro("register-error", "");
         mostrarEcra("login-view");
+        document.getElementById("login-email").focus();
     });
 
-    document.getElementById("btn-guest").addEventListener("click", entrarComoVisitante);
+    document.getElementById("btn-guest").addEventListener("click", () => entrarNoCatalogo());
+    document.getElementById("catalog-retry").addEventListener("click", carregarCatalogo);
 
-    document.getElementById("login-form").addEventListener("submit", (event) => {
+    document.getElementById("login-form").addEventListener("submit", async (event) => {
         event.preventDefault();
-        document.getElementById("login-error").textContent =
-            "A autenticação ainda não está conectada nesta pré-visualização. Explore como visitante.";
+        const form = event.currentTarget;
+        const error = document.getElementById("login-error");
+        error.textContent = "";
+        alternarCarregamento(form, true);
+
+        try {
+            const resultado = await requisicaoJson("/api/login", {
+                method: "POST",
+                body: JSON.stringify({
+                    email: document.getElementById("login-email").value,
+                    senha: document.getElementById("login-senha").value
+                })
+            });
+            await entrarNoCatalogo(resultado.utilizador);
+        } catch (requestError) {
+            error.textContent = requestError.message;
+        } finally {
+            alternarCarregamento(form, false);
+        }
     });
 
-    document.getElementById("register-form").addEventListener("submit", (event) => {
+    document.getElementById("register-form").addEventListener("submit", async (event) => {
         event.preventDefault();
-        document.getElementById("register-error").textContent =
-            "O cadastro ficará disponível quando o servidor de autenticação estiver conectado.";
+        const form = event.currentTarget;
+        const error = document.getElementById("register-error");
+        error.textContent = "";
+
+        const senha = document.getElementById("reg-senha").value;
+        const confirmacao = document.getElementById("reg-senha-confirmacao").value;
+        if (senha !== confirmacao) {
+            error.textContent = "As senhas não coincidem.";
+            document.getElementById("reg-senha-confirmacao").focus();
+            return;
+        }
+
+        alternarCarregamento(form, true);
+        try {
+            const resultado = await requisicaoJson("/api/registar", {
+                method: "POST",
+                body: JSON.stringify({
+                    nome: document.getElementById("reg-nome").value,
+                    email: document.getElementById("reg-email").value,
+                    senha
+                })
+            });
+            form.reset();
+            await entrarNoCatalogo(resultado.utilizador);
+        } catch (requestError) {
+            error.textContent = requestError.message;
+        } finally {
+            alternarCarregamento(form, false);
+        }
     });
 
     document.getElementById("search-input").addEventListener("input", (event) => {
@@ -177,18 +261,26 @@ document.addEventListener("DOMContentLoaded", () => {
         const resultados = catalogoDados.filter((filme) =>
             filme.titulo.toLocaleLowerCase("pt-BR").includes(termo)
             || filme.categoria.toLocaleLowerCase("pt-BR").includes(termo)
+            || filme.descricao.toLocaleLowerCase("pt-BR").includes(termo)
         );
         carregarCatalogoFilmes(resultados);
     });
 
-    document.getElementById("btn-logout").addEventListener("click", () => {
-        document.getElementById("search-input").value = "";
+    document.getElementById("btn-logout").addEventListener("click", async () => {
+        try {
+            await requisicaoJson("/api/logout", { method: "POST", body: "{}" });
+        } catch {
+            mostrarErro("login-error", "Não foi possível encerrar a sessão no servidor.");
+        }
+        document.getElementById("video-player").pause();
         fecharModal();
+        usuarioAtual = null;
         mostrarEcra("login-view");
     });
 
     document.getElementById("btn-hero-watch").addEventListener("click", () => {
-        abrirModalDetalhes(catalogoDados[0]);
+        const filme = catalogoDados.find((item) => item.destaque) || catalogoDados[0];
+        if (filme) abrirModalDetalhes(filme);
     });
 
     document.getElementById("modal-close").addEventListener("click", fecharModal);
@@ -196,7 +288,9 @@ document.addEventListener("DOMContentLoaded", () => {
         if (event.target.id === "movie-modal") fecharModal();
     });
     document.addEventListener("keydown", (event) => {
-        if (event.key === "Escape") fecharModal();
+        if (event.key === "Escape" && document.getElementById("movie-modal").classList.contains("active")) {
+            fecharModal();
+        }
     });
 
     document.getElementById("modal-btn-play").addEventListener("click", () => {
@@ -210,4 +304,15 @@ document.addEventListener("DOMContentLoaded", () => {
         video.pause();
         mostrarEcra("catalog-view");
     });
+
+    requisicaoJson("/api/me")
+        .then((resultado) => {
+            if (resultado.autenticado && resultado.utilizador) {
+                return entrarNoCatalogo(resultado.utilizador);
+            }
+            return undefined;
+        })
+        .catch((error) => {
+            mostrarErro("login-error", `Não foi possível conectar ao servidor: ${error.message}`);
+        });
 });
