@@ -103,6 +103,13 @@
                         </div>
                         <div class="cards-row" id="row-terror"></div>
                     </section>
+                    <section class="category-section category-section-documentary" aria-labelledby="documentary-heading">
+                        <div class="section-heading">
+                            <h2 id="documentary-heading">Documentários</h2>
+                            <span>Histórias reais, novos olhares</span>
+                        </div>
+                        <div class="cards-row" id="row-documentarios"></div>
+                    </section>
                     <section class="category-section" aria-labelledby="other-heading">
                         <div class="section-heading">
                             <h2 id="other-heading">Mais para descobrir</h2>
@@ -126,13 +133,21 @@
                 <a class="wordmark" href="/" aria-label="PyFlix, início">Py<span>Flix</span></a>
             </header>
             <div class="player-container">
-                <p class="eyebrow">AGORA EM REPRODUÇÃO</p>
+                <p class="eyebrow">TRAILER SELECIONADO</p>
                 <h1 id="player-movie-title">Título do vídeo</h1>
                 <div class="video-wrapper">
                     <video id="video-player" controls playsinline preload="metadata">
                         <source id="video-source" src="" type="video/mp4">
                         Seu navegador não suporta a reprodução de vídeo.
                     </video>
+                        <iframe
+                            id="video-embed"
+                            title="Trailer do filme"
+                            allow="accelerometer; autoplay; encrypted-media; picture-in-picture"
+                            referrerpolicy="strict-origin-when-cross-origin"
+                            allowfullscreen
+                            hidden
+                        ></iframe>
                 </div>
                 <p id="player-movie-desc" class="media-description"></p>
             </div>
@@ -146,7 +161,21 @@
             <h2 id="modal-title">Título do filme</h2>
             <span id="modal-category" class="hero-badge">Categoria</span>
             <p id="modal-desc">Descrição do filme.</p>
-            <button id="modal-btn-play" class="button button-primary" type="button">▶ Assistir agora</button>
+            <button id="modal-btn-play" class="button button-primary" type="button">▶ Assistir trailer</button>
+        </section>
+    </div>
+
+    <div id="logout-modal" class="modal-overlay logout-overlay" aria-hidden="true">
+        <section class="modal-box logout-dialog" role="alertdialog" aria-modal="true" aria-labelledby="logout-title" aria-describedby="logout-description">
+            <span class="logout-mark" aria-hidden="true"><span></span></span>
+            <p class="eyebrow">SESSÃO PYFLIX</p>
+            <h2 id="logout-title">Quer mesmo sair?</h2>
+            <p id="logout-description">Você precisará entrar novamente para continuar de onde parou.</p>
+            <p id="logout-error" class="logout-error" role="alert" aria-live="polite"></p>
+            <div class="logout-actions">
+                <button id="btn-logout-cancel" class="button button-outline" type="button">Continuar assistindo</button>
+                <button id="btn-logout-confirm" class="button button-primary" type="button">Sair da conta</button>
+            </div>
         </section>
     </div>
 </body>

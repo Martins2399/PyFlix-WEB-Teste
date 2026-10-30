@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import os
+import re
 from pathlib import Path
 
 from sqlalchemy import (
@@ -124,7 +125,109 @@ FILMES_DEMO = [
         "destaque": False,
         "ativo": True,
     },
+    {
+        "titulo": "Mad Max: Estrada da Fúria",
+        "descricao": "Em uma estrada devastada, Max e Furiosa desafiam uma perseguição implacável em busca de liberdade.",
+        "categoria": "Ação",
+        "imagem": "images/mad-max-estrada-furia.jpg",
+        "video": "youtube:hEJnMQG9ev8",
+        "ordem": 8,
+        "destaque": False,
+        "ativo": True,
+    },
+    {
+        "titulo": "John Wick: Um Novo Dia para Matar",
+        "descricao": "Um assassino lendário é atraído de volta ao submundo e enfrenta uma perigosa rede internacional.",
+        "categoria": "Ação",
+        "imagem": "images/john-wick-2.jpg",
+        "video": "youtube:ChpLV9AMqm4",
+        "ordem": 9,
+        "destaque": False,
+        "ativo": True,
+    },
+    {
+        "titulo": "Um Lugar Silencioso",
+        "descricao": "Uma família luta para sobreviver em um mundo onde o menor ruído pode ser fatal.",
+        "categoria": "Terror",
+        "imagem": "images/um-lugar-silencioso.jpg",
+        "video": "youtube:WR7cc5t7tv8",
+        "ordem": 10,
+        "destaque": False,
+        "ativo": True,
+    },
+    {
+        "titulo": "Sorria",
+        "descricao": "Depois de presenciar um acontecimento perturbador, uma médica passa a enfrentar experiências cada vez mais assustadoras.",
+        "categoria": "Terror",
+        "imagem": "images/sorria.jpg",
+        "video": "youtube:SjnjegNYjs0",
+        "ordem": 11,
+        "destaque": False,
+        "ativo": True,
+    },
+    {
+        "titulo": "Barbie",
+        "descricao": "Barbie deixa a Barbielândia e embarca em uma jornada divertida para descobrir seu lugar no mundo.",
+        "categoria": "Comédia",
+        "imagem": "images/barbie.jpg",
+        "video": "youtube:pBk4NYhWNMM",
+        "ordem": 12,
+        "destaque": False,
+        "ativo": True,
+    },
+    {
+        "titulo": "La La Land: Cantando Estações",
+        "descricao": "Uma atriz e um pianista perseguem seus sonhos enquanto descobrem um amor que desafia o tempo.",
+        "categoria": "Romance",
+        "imagem": "images/la-la-land.jpg",
+        "video": "youtube:0pdqf4P9MB8",
+        "ordem": 13,
+        "destaque": False,
+        "ativo": True,
+    },
+    {
+        "titulo": "Wonka",
+        "descricao": "Antes de se tornar o maior chocolatier do mundo, um jovem inventor transforma a cidade com imaginação.",
+        "categoria": "Fantasia",
+        "imagem": "images/wonka.jpg",
+        "video": "youtube:oACMU-w1RXw",
+        "ordem": 14,
+        "destaque": False,
+        "ativo": True,
+    },
+    {
+        "titulo": "Free Solo",
+        "descricao": "O escalador Alex Honnold se prepara para realizar uma subida histórica sem cordas.",
+        "categoria": "Documentário",
+        "imagem": "images/free-solo.jpg",
+        "video": "youtube:urRVZ4SW7WU",
+        "ordem": 15,
+        "destaque": False,
+        "ativo": True,
+    },
+    {
+        "titulo": "Meu Professor Polvo",
+        "descricao": "Um cineasta cria uma amizade improvável com um polvo em uma floresta de algas sul-africana.",
+        "categoria": "Documentário",
+        "imagem": "images/meu-professor-polvo.jpg",
+        "video": "youtube:3s0LTDhqe5A",
+        "ordem": 16,
+        "destaque": False,
+        "ativo": True,
+    },
+    {
+        "titulo": "A Vida no Nosso Planeta",
+        "descricao": "Uma viagem pela história da vida na Terra, das criaturas pré-históricas aos ecossistemas atuais.",
+        "categoria": "Documentário",
+        "imagem": "images/nosso-planeta.jpg",
+        "video": "youtube:xy1v0pzMP4g",
+        "ordem": 17,
+        "destaque": False,
+        "ativo": True,
+    },
 ]
+
+YOUTUBE_VIDEO_REFERENCE = re.compile(r"^youtube:([A-Za-z0-9_-]{11})$")
 
 
 def normalize_database_url(database_url: str) -> str:
@@ -164,24 +267,35 @@ def is_safe_media_file(relative_path: str, expected_folder: str) -> bool:
     return file_path.is_relative_to(static_root) and file_path.is_file()
 
 
+def video_reference_type(reference: str) -> str | None:
+    """Accept local trailers or an 11-character YouTube video ID marker."""
+    if not isinstance(reference, str):
+        return None
+    if YOUTUBE_VIDEO_REFERENCE.fullmatch(reference):
+        return "youtube"
+    if is_safe_media_file(reference, "videos"):
+        return "local"
+    return None
+
+
 def initialize_database(engine: Engine, *, seed_catalog: bool = True) -> None:
-    """Create any missing tables and add demo films only to an empty catalog."""
+    """Create tables and append missing demo films without overwriting existing rows."""
     metadata.create_all(engine)
     if not seed_catalog:
         return
 
     with engine.begin() as connection:
-        has_films = connection.execute(select(filmes.c.id).limit(1)).first()
-        if has_films:
-            return
+        existing_titles = set(connection.execute(select(filmes.c.titulo)).scalars())
 
         available_films = [
             film
             for film in FILMES_DEMO
-            if is_safe_media_file(film["imagem"], "images")
-            and is_safe_media_file(film["video"], "videos")
+            if film["titulo"] not in existing_titles
+            and is_safe_media_file(film["imagem"], "images")
+            and video_reference_type(film["video"]) is not None
         ]
         if available_films:
             connection.execute(insert(filmes), available_films)
+            LOGGER.info("%s novos filmes de demonstração adicionados ao catálogo.", len(available_films))
         else:
-            LOGGER.warning("Catálogo vazio: nenhum arquivo de demonstração foi encontrado.")
+            LOGGER.debug("Nenhum novo filme de demonstração foi adicionado.")

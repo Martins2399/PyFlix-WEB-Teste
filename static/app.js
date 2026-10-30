@@ -90,6 +90,7 @@ function carregarCatalogoFilmes(listaFilmes) {
     const secoes = [
         { id: "row-acao", categoria: "Ação" },
         { id: "row-terror", categoria: "Terror" },
+        { id: "row-documentarios", categoria: "Documentário" },
         { id: "row-outros", categoria: "outros" }
     ];
     let totalVisivel = 0;
@@ -98,7 +99,7 @@ function carregarCatalogoFilmes(listaFilmes) {
         const linha = document.getElementById(id);
         const secao = linha.closest(".category-section");
         const filmes = categoria === "outros"
-            ? listaFilmes.filter((filme) => !["Ação", "Terror"].includes(filme.categoria))
+            ? listaFilmes.filter((filme) => !["Ação", "Terror", "Documentário"].includes(filme.categoria))
             : listaFilmes.filter((filme) => filme.categoria === categoria);
 
         linha.replaceChildren();
@@ -173,13 +174,72 @@ function abrirPlayer(filme) {
     document.getElementById("player-movie-desc").textContent = filme.descricao;
 
     const video = document.getElementById("video-player");
-    document.getElementById("video-source").src = urlMidia(filme.video);
-    video.load();
+    const embed = document.getElementById("video-embed");
+    if (filme.video_tipo === "youtube") {
+        video.pause();
+        video.hidden = true;
+        embed.hidden = false;
+        embed.title = `Trailer: ${filme.titulo}`;
+        embed.src = filme.video_url;
+    } else {
+        embed.removeAttribute("src");
+        embed.hidden = true;
+        video.hidden = false;
+        document.getElementById("video-source").src = urlMidia(filme.video_url || filme.video);
+        video.load();
+    }
     mostrarEcra("player-view");
 }
 
 function mostrarErro(idElemento, mensagem) {
     document.getElementById(idElemento).textContent = mensagem;
+}
+
+function abrirConfirmacaoLogout() {
+    const modal = document.getElementById("logout-modal");
+    modal.dataset.returnFocus = document.activeElement?.id || "";
+    mostrarErro("logout-error", "");
+    modal.classList.add("active");
+    modal.setAttribute("aria-hidden", "false");
+    document.getElementById("btn-logout-cancel").focus();
+}
+
+function fecharConfirmacaoLogout(devolverFoco = true) {
+    const modal = document.getElementById("logout-modal");
+    modal.classList.remove("active");
+    modal.setAttribute("aria-hidden", "true");
+    mostrarErro("logout-error", "");
+
+    if (devolverFoco && modal.dataset.returnFocus) {
+        document.getElementById(modal.dataset.returnFocus)?.focus();
+    }
+}
+
+async function confirmarLogout() {
+    const confirmButton = document.getElementById("btn-logout-confirm");
+    const cancelButton = document.getElementById("btn-logout-cancel");
+    const error = document.getElementById("logout-error");
+    error.textContent = "";
+    confirmButton.disabled = true;
+    cancelButton.disabled = true;
+    confirmButton.textContent = "Encerrando…";
+
+    try {
+        await requisicaoJson("/api/logout", { method: "POST", body: "{}" });
+        fecharConfirmacaoLogout(false);
+        document.getElementById("video-player").pause();
+        fecharModal();
+        usuarioAtual = null;
+        mostrarEcra("login-view");
+        document.getElementById("login-email").focus();
+    } catch {
+        error.textContent = "Não foi possível encerrar a sessão. Tente novamente.";
+        confirmButton.focus();
+    } finally {
+        confirmButton.disabled = false;
+        cancelButton.disabled = false;
+        confirmButton.textContent = "Sair da conta";
+    }
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -266,17 +326,9 @@ document.addEventListener("DOMContentLoaded", () => {
         carregarCatalogoFilmes(resultados);
     });
 
-    document.getElementById("btn-logout").addEventListener("click", async () => {
-        try {
-            await requisicaoJson("/api/logout", { method: "POST", body: "{}" });
-        } catch {
-            mostrarErro("login-error", "Não foi possível encerrar a sessão no servidor.");
-        }
-        document.getElementById("video-player").pause();
-        fecharModal();
-        usuarioAtual = null;
-        mostrarEcra("login-view");
-    });
+    document.getElementById("btn-logout").addEventListener("click", abrirConfirmacaoLogout);
+    document.getElementById("btn-logout-cancel").addEventListener("click", () => fecharConfirmacaoLogout());
+    document.getElementById("btn-logout-confirm").addEventListener("click", confirmarLogout);
 
     document.getElementById("btn-hero-watch").addEventListener("click", () => {
         const filme = catalogoDados.find((item) => item.destaque) || catalogoDados[0];
@@ -287,9 +339,39 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("movie-modal").addEventListener("click", (event) => {
         if (event.target.id === "movie-modal") fecharModal();
     });
+    document.getElementById("logout-modal").addEventListener("click", (event) => {
+        if (event.target.id === "logout-modal") fecharConfirmacaoLogout();
+    });
     document.addEventListener("keydown", (event) => {
         if (event.key === "Escape" && document.getElementById("movie-modal").classList.contains("active")) {
             fecharModal();
+        }
+
+        const logoutModal = document.getElementById("logout-modal");
+        if (!logoutModal.classList.contains("active")) return;
+
+        if (event.key === "Escape") {
+            event.preventDefault();
+            fecharConfirmacaoLogout();
+            return;
+        }
+
+        if (event.key === "Tab") {
+            const focusable = [...logoutModal.querySelectorAll("button:not(:disabled)")];
+            const first = focusable[0];
+            const last = focusable[focusable.length - 1];
+            if (!logoutModal.contains(document.activeElement)) {
+                event.preventDefault();
+                (event.shiftKey ? last : first)?.focus();
+                return;
+            }
+            if (event.shiftKey && document.activeElement === first) {
+                event.preventDefault();
+                last.focus();
+            } else if (!event.shiftKey && document.activeElement === last) {
+                event.preventDefault();
+                first.focus();
+            }
         }
     });
 
@@ -302,6 +384,10 @@ document.addEventListener("DOMContentLoaded", () => {
     document.getElementById("btn-back-catalog").addEventListener("click", () => {
         const video = document.getElementById("video-player");
         video.pause();
+        const embed = document.getElementById("video-embed");
+        embed.removeAttribute("src");
+        embed.hidden = true;
+        video.hidden = false;
         mostrarEcra("catalog-view");
     });
 

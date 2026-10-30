@@ -10,9 +10,9 @@ PyFlix é uma aplicação web com cadastro e login reais, catálogo carregado do
 - Sessão de login segura e opção de sair.
 - Exploração do catálogo sem conta.
 - Busca por título, descrição e categoria.
-- Filmes, descrições, categorias e caminhos de imagem/vídeo vêm da tabela `filmes`, não de uma lista fixa no JavaScript.
-- Reprodução dos vídeos incluídos no projeto.
-- Catálogo inicial adicionado ao banco somente se a tabela estiver vazia e os arquivos de mídia correspondentes existirem.
+- Filmes, descrições, categorias e referências de mídia vêm da tabela `filmes`, não de uma lista fixa no JavaScript.
+- Reprodução de trailers locais e trailers oficiais incorporados do YouTube.
+- Novos filmes de demonstração são acrescentados por título, sem sobrescrever ou duplicar os registros já existentes.
 
 ## Executar no Replit
 
@@ -29,11 +29,11 @@ Para executar manualmente:
 ## Banco de dados e arquivos
 
 - `usuarios`: contas e hashes de senha.
-- `filmes`: título, descrição, categoria, caminhos relativos dos arquivos, ordem, destaque e estado ativo.
-- Imagens e vídeos ficam em `static/images/` e `static/videos/`. O banco guarda somente caminhos relativos, não os arquivos de vídeo.
+- `filmes`: título, descrição, categoria, referências de mídia, ordem, destaque e estado ativo.
+- Capas ilustrativas ficam em `static/images/`; trailers locais ficam em `static/videos/`. Para os novos trailers públicos, o banco guarda somente o ID do YouTube, e o app monta uma URL de incorporação segura.
 - Em produção, o servidor exige `DATABASE_URL` para evitar salvar contas em um disco temporário. Não use SQLite em hospedagem com sistema de arquivos efêmero.
 
-O banco SQLite local foi mantido no computador e removido do rastreamento do Git. A tabela de usuários estava sem contas quando preparei este projeto; o app agora preenche a tabela de filmes com os sete vídeos de demonstração. O `.gitignore` evita adicionar o banco novamente. Se versões anteriores do banco com contas já tiverem sido enviadas a um repositório remoto, apagar o arquivo em um commit novo não remove esses dados do histórico.
+O banco SQLite local foi mantido no computador e removido do rastreamento do Git. A tabela de usuários estava sem contas quando preparei este projeto; o app mantém os sete filmes originais e acrescenta os novos itens de demonstração. O `.gitignore` evita adicionar o banco novamente. Se versões anteriores do banco com contas já tiverem sido enviadas a um repositório remoto, apagar o arquivo em um commit novo não remove esses dados do histórico.
 
 ## Testar
 

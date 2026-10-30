@@ -11,10 +11,10 @@ _IMPORT_TIME_DATABASE = tempfile.TemporaryDirectory()
 _PREVIOUS_DATABASE_URL = os.environ.get("DATABASE_URL")
 os.environ["DATABASE_URL"] = f"sqlite:///{Path(_IMPORT_TIME_DATABASE.name) / 'module-import.db'}"
 
-from sqlalchemy import insert, select
+from sqlalchemy import delete, func, insert, select
 from werkzeug.security import check_password_hash
 
-from database import usuarios
+from database import FILMES_DEMO, filmes, initialize_database, usuarios
 from server import app as _default_app, create_app
 
 if _PREVIOUS_DATABASE_URL is None:
@@ -113,13 +113,42 @@ class PyFlixAuthAndCatalogTests(unittest.TestCase):
     def test_catalog_is_read_from_database_and_media_exists(self):
         response = self.client.get("/api/filmes")
         self.assertEqual(response.status_code, 200)
-        self.assertGreaterEqual(response.json["total"], 1)
+        self.assertEqual(response.json["total"], len(FILMES_DEMO))
         self.assertEqual(response.json["filmes"][0]["titulo"], "Exterminador do Futuro 7")
 
         root = Path(__file__).resolve().parents[1]
         for film in response.json["filmes"]:
             self.assertTrue((root / "static" / film["imagem"]).is_file())
-            self.assertTrue((root / "static" / film["video"]).is_file())
+            if film["video_tipo"] == "local":
+                self.assertTrue((root / "static" / film["video_url"]).is_file())
+            else:
+                self.assertRegex(
+                    film["video_url"],
+                    r"^https://www\.youtube-nocookie\.com/embed/[A-Za-z0-9_-]{11}\?rel=0$",
+                )
+
+        documentaries = [
+            film for film in response.json["filmes"]
+            if film["categoria"] == "Documentário"
+        ]
+        self.assertEqual(len(documentaries), 3)
+
+    def test_catalog_initialization_appends_missing_demo_movies_without_duplicates(self):
+        new_titles = [film["titulo"] for film in FILMES_DEMO[7:]]
+        with self.engine.begin() as connection:
+            connection.execute(delete(filmes).where(filmes.c.titulo.in_(new_titles)))
+
+        initialize_database(self.engine)
+        initialize_database(self.engine)
+
+        with self.engine.connect() as connection:
+            count = connection.execute(select(func.count()).select_from(filmes)).scalar_one()
+            mad_max_count = connection.execute(
+                select(func.count()).select_from(filmes).where(filmes.c.titulo == "Mad Max: Estrada da Fúria")
+            ).scalar_one()
+
+        self.assertEqual(count, len(FILMES_DEMO))
+        self.assertEqual(mad_max_count, 1)
 
     def test_page_health_and_same_origin_registration(self):
         page = self.client.get("/")

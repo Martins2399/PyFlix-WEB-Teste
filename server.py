@@ -14,7 +14,15 @@ from sqlalchemy import desc, insert, select, update
 from sqlalchemy.exc import IntegrityError
 from werkzeug.security import check_password_hash, generate_password_hash
 
-from database import ROOT_DIR, filmes, initialize_database, is_safe_media_file, make_engine, usuarios
+from database import (
+    ROOT_DIR,
+    filmes,
+    initialize_database,
+    is_safe_media_file,
+    make_engine,
+    usuarios,
+    video_reference_type,
+)
 
 
 EMAIL_PATTERN = re.compile(r"^[^\s@]+@[^\s@]+\.[^\s@]+$")
@@ -239,9 +247,14 @@ def create_app(
 
         catalog = []
         for row in rows:
-            if not is_safe_media_file(row["imagem"], "images") or not is_safe_media_file(row["video"], "videos"):
+            video_type = video_reference_type(row["video"])
+            if not is_safe_media_file(row["imagem"], "images") or video_type is None:
                 LOGGER.warning("Filme %s ignorado por referência de mídia inválida.", row["id"])
                 continue
+            video_url = row["video"]
+            if video_type == "youtube":
+                video_id = row["video"].split(":", 1)[1]
+                video_url = f"https://www.youtube-nocookie.com/embed/{video_id}?rel=0"
             catalog.append(
                 {
                     "id": int(row["id"]),
@@ -250,6 +263,8 @@ def create_app(
                     "categoria": row["categoria"],
                     "imagem": row["imagem"],
                     "video": row["video"],
+                    "video_tipo": video_type,
+                    "video_url": video_url,
                     "destaque": bool(row["destaque"]),
                 }
             )
