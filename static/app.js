@@ -4,7 +4,6 @@ document.addEventListener("DOMContentLoaded", () => {
     let currentHeroIndex = 0;
     let selectedFilm = null;
 
-    // Elementos DOM de Telas
     const views = {
         login: document.getElementById("login-view"),
         register: document.getElementById("register-view"),
@@ -56,7 +55,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const playerMovieTitle = document.getElementById("player-movie-title");
     const playerMovieDesc = document.getElementById("player-movie-desc");
 
-    // Função de Troca de Telas
     function switchView(target) {
         Object.values(views).forEach(v => v.classList.remove("active"));
         if (views[target]) {
@@ -65,7 +63,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Verificar Sessão Atual
     async function checkSession() {
         try {
             const res = await fetch("/api/me");
@@ -80,7 +77,6 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Buscar Filmes do Catálogo
     async function fetchFilmes() {
         try {
             const res = await fetch("/api/filmes");
@@ -97,13 +93,14 @@ document.addEventListener("DOMContentLoaded", () => {
         }
     }
 
-    // Renderizar Hero (Destaque)
     function renderHero() {
         if (!destaques.length) return;
         const current = destaques[currentHeroIndex];
         if (heroTitle) heroTitle.textContent = current.titulo;
         if (heroDesc) heroDesc.textContent = current.descricao;
-        if (heroSection) heroSection.style.backgroundImage = `url('/static/${current.imagem}')`;
+        if (heroSection) {
+            heroSection.style.backgroundImage = `url('/static/${current.imagem}')`;
+        }
         if (heroIndexCurrent) heroIndexCurrent.textContent = String(currentHeroIndex + 1).padStart(2, '0');
         if (heroIndexTotal) heroIndexTotal.textContent = String(destaques.length).padStart(2, '0');
     }
@@ -125,7 +122,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Renderizar Catálogo nas Fileiras
     function renderCatalog(filmes) {
         Object.values(rows).forEach(r => { if (r) r.innerHTML = ""; });
 
@@ -158,19 +154,17 @@ document.addEventListener("DOMContentLoaded", () => {
         if (emptySearch) emptySearch.hidden = hasVisible;
     }
 
-    // Rolagem Lateral das Fileiras (< e >)
     document.querySelectorAll('.row-container').forEach(container => {
         const row = container.querySelector('.cards-row');
         const leftBtn = container.querySelector('.scroll-left');
         const rightBtn = container.querySelector('.scroll-right');
 
         if (leftBtn && rightBtn && row) {
-            leftBtn.addEventListener('click', () => row.scrollBy({ left: -500, behavior: 'smooth' }));
-            rightBtn.addEventListener('click', () => row.scrollBy({ left: 500, behavior: 'smooth' }));
+            leftBtn.addEventListener('click', () => row.scrollBy({ left: -600, behavior: 'smooth' }));
+            rightBtn.addEventListener('click', () => row.scrollBy({ left: 600, behavior: 'smooth' }));
         }
     });
 
-    // Barra de Pesquisa
     if (searchInput) {
         searchInput.addEventListener("input", (e) => {
             const term = e.target.value.toLowerCase().trim();
@@ -183,7 +177,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Modal de Detalhes
     function openModal(filme) {
         selectedFilm = filme;
         if (modalTitle) modalTitle.textContent = filme.titulo;
@@ -209,7 +202,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Player de Vídeo
     function playMovie(filme) {
         if (playerMovieTitle) playerMovieTitle.textContent = filme.titulo;
         if (playerMovieDesc) playerMovieDesc.textContent = filme.descricao;
@@ -247,7 +239,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Formulário de Login
     if (loginForm) {
         loginForm.addEventListener("submit", async (e) => {
             e.preventDefault();
@@ -274,7 +265,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Formulário de Cadastro
     if (registerForm) {
         registerForm.addEventListener("submit", async (e) => {
             e.preventDefault();
@@ -308,7 +298,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Botões de Alternância de Telas (Visitante, Criar Conta, Voltar)
     const btnGuest = document.getElementById("btn-guest");
     if (btnGuest) {
         btnGuest.addEventListener("click", () => {
@@ -327,13 +316,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const linkToLogin = document.getElementById("link-to-login");
     if (linkToLogin) {
-    linkToLogin.addEventListener("click", (e) => {
-        e.preventDefault();
-        switchView("login");
-    });
-}
+        linkToLogin.addEventListener("click", (e) => {
+            e.preventDefault();
+            switchView("login");
+        });
+    }
 
-    // Logout
     if (btnLogout) {
         btnLogout.addEventListener("click", () => {
             if (logoutModal) logoutModal.classList.add("active");
@@ -353,7 +341,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Inicialização da Aplicação
     checkSession();
     fetchFilmes();
 });

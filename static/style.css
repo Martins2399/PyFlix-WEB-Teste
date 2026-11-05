@@ -20,7 +20,6 @@ body {
     overflow-x: hidden;
 }
 
-/* Ocultar views por padrão e exibir apenas a ativa */
 .view {
     display: none !important;
     min-height: 100vh;
@@ -30,7 +29,6 @@ body {
     display: block !important;
 }
 
-/* Telas de Autenticação */
 .auth-view {
     min-height: 100vh;
     padding: 2rem;
@@ -275,23 +273,24 @@ body {
     font-size: 0.85rem;
 }
 
-/* Hero Section */
+/* Hero Section (Corrigido para exibir a foto de fundo corretamente) */
 .hero {
     position: relative;
-    height: 70vh;
-    min-height: 480px;
-    background-size: cover;
-    background-position: center;
+    height: 75vh;
+    min-height: 500px;
+    background-size: cover !important;
+    background-position: center center !important;
+    background-repeat: no-repeat !important;
     display: flex;
     align-items: flex-end;
-    padding: 4vw;
-    transition: background-image 0.4s ease-in-out;
+    padding: 4vw 4vw 5rem 4vw;
 }
 
 .hero-shade {
     position: absolute;
     inset: 0;
-    background: linear-gradient(0deg, var(--bg-color) 0%, rgba(9,9,11,0.5) 50%, rgba(9,9,11,0.2) 100%);
+    background: linear-gradient(180deg, rgba(9,9,11,0.2) 0%, rgba(9,9,11,0.6) 60%, var(--bg-color) 100%);
+    z-index: 1;
 }
 
 .hero-info {
@@ -542,31 +541,4 @@ body {
     justify-content: space-between;
     color: var(--text-muted);
     font-size: 0.85rem;
-}
-
-/* Hero Section (Destaque com Imagem de Fundo Corrigida) */
-.hero {
-    position: relative;
-    height: 75vh;
-    min-height: 500px;
-    background-size: cover;
-    background-position: center center;
-    background-repeat: no-repeat;
-    display: flex;
-    align-items: flex-end;
-    padding: 4vw 4vw 5rem 4vw;
-    transition: background-image 0.5s ease-in-out;
-}
-
-.hero-shade {
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, rgba(9,9,11,0.3) 0%, rgba(9,9,11,0.6) 60%, var(--bg-color) 100%);
-    z-index: 1;
-}
-
-.hero-info {
-    position: relative;
-    z-index: 10;
-    max-width: 600px;
 }

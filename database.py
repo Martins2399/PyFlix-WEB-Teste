@@ -132,7 +132,7 @@ FILMES_DEMO = [
         "imagem": "images/mad-max-estrada-furia.jpg",
         "video": "youtube:hEJnMQG9ev8",
         "ordem": 8,
-        "destaque": False,
+        "destaque": True,
         "ativo": True,
     },
     {
@@ -152,7 +152,7 @@ FILMES_DEMO = [
         "imagem": "images/um-lugar-silencioso.jpg",
         "video": "youtube:WR7cc5t7tv8",
         "ordem": 10,
-        "destaque": False,
+        "destaque": True,
         "ativo": True,
     },
     {
