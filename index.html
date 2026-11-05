@@ -5,13 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="theme-color" content="#09090b">
     <meta name="description" content="Explore filmes e trailers no PyFlix.">
-    <title>PyFlix — filmes para assistir</title>
+    <title>PyFlix — Filmes e Séries</title>
     <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
     <link rel="stylesheet" href="/static/style.css">
     <script src="/static/app.js" defer></script>
 </head>
 <body>
     <main>
+        <!-- Tela de Login -->
         <section id="login-view" class="view auth-view active" aria-labelledby="login-title">
             <div class="auth-card">
                 <a class="wordmark" href="/" aria-label="PyFlix, início">Py<span>Flix</span></a>
@@ -33,6 +34,7 @@
             </div>
         </section>
 
+        <!-- Tela de Cadastro -->
         <section id="register-view" class="view auth-view" aria-labelledby="register-title">
             <div class="auth-card">
                 <a class="wordmark" href="/" aria-label="PyFlix, início">Py<span>Flix</span></a>
@@ -55,16 +57,25 @@
             </div>
         </section>
 
+        <!-- Catálogo Principal (Estilo Streaming) -->
         <section id="catalog-view" class="view catalog-view" aria-label="Catálogo PyFlix">
             <header class="navbar">
-                <a class="wordmark" href="/" aria-label="PyFlix, início">Py<span>Flix</span></a>
-                <label class="search-box" for="search-input">
-                    <span aria-hidden="true">⌕</span>
-                    <input id="search-input" type="search" placeholder="Buscar filmes ou categorias" autocomplete="off">
-                </label>
-                <div class="user-menu">
-                    <span id="user-greeting">Olá, visitante</span>
-                    <button id="btn-logout" class="button button-small button-outline" type="button">Sair</button>
+                <div class="navbar-left">
+                    <a class="wordmark" href="/" aria-label="PyFlix, início">Py<span>Flix</span></a>
+                    <nav class="nav-links">
+                        <a href="#" class="active">Início</a>
+                        <a href="#categories-container">Filmes</a>
+                    </nav>
+                </div>
+                <div class="navbar-right">
+                    <label class="search-box" for="search-input">
+                        <span aria-hidden="true">⌕</span>
+                        <input id="search-input" type="search" placeholder="Buscar filmes ou categorias" autocomplete="off">
+                    </label>
+                    <div class="user-menu">
+                        <span id="user-greeting">Olá, visitante</span>
+                        <button id="btn-logout" class="button button-small button-outline" type="button">Sair</button>
+                    </div>
                 </div>
             </header>
 
@@ -73,14 +84,23 @@
                     <div class="hero-shade"></div>
                     <div class="hero-info">
                         <span class="hero-badge">DESTAQUE DA SEMANA</span>
-                        <p class="hero-kicker">UMA NOVA AVENTURA ESPERA POR VOCÊ</p>
+                        <p class="hero-kicker" id="hero-kicker">UMA NOVA AVENTURA ESPERA POR VOCÊ</p>
                         <h1 id="hero-title">Exterminador do Futuro 7</h1>
                         <p id="hero-desc">O futuro é incerto, mas a luta pela sobrevivência é certa.</p>
-                        <button id="btn-hero-watch" class="button button-primary" type="button">
-                            <span aria-hidden="true">▶</span> Ver destaque
-                        </button>
+                        <div class="hero-actions">
+                            <button id="btn-hero-watch" class="button button-primary" type="button">
+                                <span aria-hidden="true">▶</span> Ver destaque
+                            </button>
+                            <button id="btn-hero-info" class="button button-secondary" type="button">
+                                ℹ Mais informações
+                            </button>
+                        </div>
                     </div>
-                    <span class="hero-index" aria-hidden="true"><span id="hero-index-current">01</span> <span>/ <span id="hero-index-total">07</span></span></span>
+                    <div class="hero-controls">
+                        <button id="hero-prev" class="hero-control-btn" aria-label="Filme anterior">❮</button>
+                        <span class="hero-index" aria-hidden="true"><span id="hero-index-current">01</span> / <span><span id="hero-index-total">07</span></span></span>
+                        <button id="hero-next" class="hero-control-btn" aria-label="Próximo filme">❯</button>
+                    </div>
                 </section>
 
                 <div id="categories-container" class="categories">
@@ -89,34 +109,55 @@
                         <p>Não foi possível carregar o catálogo agora.</p>
                         <button id="catalog-retry" class="button button-outline" type="button">Tentar novamente</button>
                     </div>
+                    
                     <section class="category-section" aria-labelledby="action-heading">
                         <div class="section-heading">
                             <h2 id="action-heading">Ação</h2>
                             <span>Histórias em alta</span>
                         </div>
-                        <div class="cards-row" id="row-acao"></div>
+                        <div class="row-container">
+                            <button class="row-scroll-btn scroll-left" aria-label="Rolar para esquerda">‹</button>
+                            <div class="cards-row" id="row-acao"></div>
+                            <button class="row-scroll-btn scroll-right" aria-label="Rolar para direita">›</button>
+                        </div>
                     </section>
+
                     <section class="category-section" aria-labelledby="horror-heading">
                         <div class="section-heading">
                             <h2 id="horror-heading">Terror</h2>
                             <span>Para quem gosta de suspense</span>
                         </div>
-                        <div class="cards-row" id="row-terror"></div>
+                        <div class="row-container">
+                            <button class="row-scroll-btn scroll-left" aria-label="Rolar para esquerda">‹</button>
+                            <div class="cards-row" id="row-terror"></div>
+                            <button class="row-scroll-btn scroll-right" aria-label="Rolar para direita">›</button>
+                        </div>
                     </section>
+
                     <section class="category-section category-section-documentary" aria-labelledby="documentary-heading">
                         <div class="section-heading">
                             <h2 id="documentary-heading">Documentários</h2>
                             <span>Histórias reais, novos olhares</span>
                         </div>
-                        <div class="cards-row" id="row-documentarios"></div>
+                        <div class="row-container">
+                            <button class="row-scroll-btn scroll-left" aria-label="Rolar para esquerda">‹</button>
+                            <div class="cards-row" id="row-documentarios"></div>
+                            <button class="row-scroll-btn scroll-right" aria-label="Rolar para direita">›</button>
+                        </div>
                     </section>
+
                     <section class="category-section" aria-labelledby="other-heading">
                         <div class="section-heading">
                             <h2 id="other-heading">Mais para descobrir</h2>
                             <span>Outros gêneros</span>
                         </div>
-                        <div class="cards-row" id="row-outros"></div>
+                        <div class="row-container">
+                            <button class="row-scroll-btn scroll-left" aria-label="Rolar para esquerda">‹</button>
+                            <div class="cards-row" id="row-outros"></div>
+                            <button class="row-scroll-btn scroll-right" aria-label="Rolar para direita">›</button>
+                        </div>
                     </section>
+
                     <p id="empty-search" class="empty-search" hidden>Nenhum filme encontrado. Tente outro título ou categoria.</p>
                 </div>
             </div>
@@ -127,6 +168,7 @@
             </footer>
         </section>
 
+        <!-- Player de Vídeo -->
         <section id="player-view" class="view player-view" aria-label="Reprodutor de vídeo">
             <header class="player-navbar">
                 <button id="btn-back-catalog" class="button button-outline" type="button">← Voltar ao catálogo</button>
@@ -140,20 +182,21 @@
                         <source id="video-source" src="" type="video/mp4">
                         Seu navegador não suporta a reprodução de vídeo.
                     </video>
-                        <iframe
-                            id="video-embed"
-                            title="Trailer do filme"
-                            allow="accelerometer; autoplay; encrypted-media; picture-in-picture"
-                            referrerpolicy="strict-origin-when-cross-origin"
-                            allowfullscreen
-                            hidden
-                        ></iframe>
+                    <iframe
+                        id="video-embed"
+                        title="Trailer do filme"
+                        allow="accelerometer; autoplay; encrypted-media; picture-in-picture"
+                        referrerpolicy="strict-origin-when-cross-origin"
+                        allowfullscreen
+                        hidden
+                    ></iframe>
                 </div>
                 <p id="player-movie-desc" class="media-description"></p>
             </div>
         </section>
     </main>
 
+    <!-- Modal Detalhes -->
     <div id="movie-modal" class="modal-overlay" aria-hidden="true">
         <section class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modal-title" aria-describedby="modal-desc">
             <button id="modal-close" class="modal-close-btn" type="button" aria-label="Fechar detalhes">×</button>
@@ -165,6 +208,7 @@
         </section>
     </div>
 
+    <!-- Modal Logout -->
     <div id="logout-modal" class="modal-overlay logout-overlay" aria-hidden="true">
         <section class="modal-box logout-dialog" role="alertdialog" aria-modal="true" aria-labelledby="logout-title" aria-describedby="logout-description">
             <span class="logout-mark" aria-hidden="true"><span></span></span>
