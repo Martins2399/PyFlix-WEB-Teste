@@ -231,7 +231,6 @@ YOUTUBE_VIDEO_REFERENCE = re.compile(r"^youtube:([A-Za-z0-9_-]{11})$")
 
 
 def normalize_database_url(database_url: str) -> str:
-    """Normalize hosted PostgreSQL URLs for the psycopg 3 SQLAlchemy driver."""
     if database_url.startswith("postgres://"):
         return "postgresql+psycopg://" + database_url.removeprefix("postgres://")
     if database_url.startswith("postgresql://"):
@@ -240,7 +239,6 @@ def normalize_database_url(database_url: str) -> str:
 
 
 def make_engine(database_url: str | None = None) -> Engine:
-    """Create a SQLite engine locally or a PostgreSQL engine when configured."""
     database_url = database_url or os.getenv("DATABASE_URL")
     if not database_url:
         sqlite_path = Path(os.getenv("PYFLIX_SQLITE_PATH", str(DEFAULT_SQLITE_PATH)))
@@ -255,7 +253,6 @@ def make_engine(database_url: str | None = None) -> Engine:
 
 
 def is_safe_media_file(relative_path: str, expected_folder: str) -> bool:
-    """Ensure a database media reference stays inside the app's static assets."""
     candidate = Path(relative_path)
     if candidate.is_absolute() or ".." in candidate.parts or not candidate.parts:
         return False
@@ -268,7 +265,6 @@ def is_safe_media_file(relative_path: str, expected_folder: str) -> bool:
 
 
 def video_reference_type(reference: str) -> str | None:
-    """Accept local trailers or an 11-character YouTube video ID marker."""
     if not isinstance(reference, str):
         return None
     if YOUTUBE_VIDEO_REFERENCE.fullmatch(reference):
@@ -279,7 +275,6 @@ def video_reference_type(reference: str) -> str | None:
 
 
 def initialize_database(engine: Engine, *, seed_catalog: bool = True) -> None:
-    """Create tables and append missing demo films without overwriting existing rows."""
     metadata.create_all(engine)
     if not seed_catalog:
         return

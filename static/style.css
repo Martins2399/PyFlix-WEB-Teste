@@ -200,7 +200,6 @@ body {
     margin-top: 1rem;
 }
 
-/* Navbar */
 .navbar {
     background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.4) 70%, transparent 100%);
     position: fixed;
@@ -273,7 +272,6 @@ body {
     font-size: 0.85rem;
 }
 
-/* Hero Section (Corrigido para exibir a foto de fundo corretamente) */
 .hero {
     position: relative;
     height: 75vh;
@@ -359,7 +357,6 @@ body {
     background: rgba(255, 255, 255, 0.4);
 }
 
-/* Categorias e Fileiras */
 .categories {
     padding: 2rem 4vw 4vw 4vw;
 }
@@ -421,7 +418,6 @@ body {
 .scroll-left { left: 0; }
 .scroll-right { right: 0; }
 
-/* Cards com Zoom */
 .card {
     flex: 0 0 auto;
     width: 180px;
@@ -457,7 +453,6 @@ body {
     text-overflow: ellipsis;
 }
 
-/* Modais e Player */
 .modal-overlay {
     position: fixed;
     inset: 0;
