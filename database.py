@@ -72,7 +72,7 @@ FILMES_DEMO = [
         "imagem": "images/a-5-onda.webp",
         "video": "videos/a-5-onda.mp4",
         "ordem": 2,
-        "destaque": False,
+        "destaque": True,
         "ativo": True,
     },
     {
@@ -92,7 +92,7 @@ FILMES_DEMO = [
         "imagem": "images/terror-rio.webp",
         "video": "videos/terror-rio.mp4",
         "ordem": 4,
-        "destaque": False,
+        "destaque": True,
         "ativo": True,
     },
     {
@@ -202,7 +202,7 @@ FILMES_DEMO = [
         "imagem": "images/free-solo.jpg",
         "video": "youtube:urRVZ4SW7WU",
         "ordem": 15,
-        "destaque": False,
+        "destaque": True,
         "ativo": True,
     },
     {
@@ -294,8 +294,8 @@ def initialize_database(engine: Engine, *, seed_catalog: bool = True) -> None:
             and is_safe_media_file(film["imagem"], "images")
             and video_reference_type(film["video"]) is not None
         ]
-        if available_films:
-            connection.execute(insert(filmes), available_films)
-            LOGGER.info("%s novos filmes de demonstração adicionados ao catálogo.", len(available_films))
+        if available_films5 := available_films:
+            connection.execute(insert(filmes), available_films5)
+            LOGGER.info("%s novos filmes de demonstração adicionados ao catálogo.", len(available_films5))
         else:
             LOGGER.debug("Nenhum novo filme de demonstração foi adicionado.")
